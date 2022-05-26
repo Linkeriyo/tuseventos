@@ -5,7 +5,7 @@ class Article(models.Model):
     title = models.CharField(max_length=200)
     subtitle = models.CharField(max_length=200, null=True, blank=True)
     text = models.TextField()
-    image = models.ImageField(upload_to='articles', null=True, blank=True)
+    image = models.ImageField(upload_to='static/articles', null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
