@@ -18,7 +18,7 @@ def get_articles(request):
         page = data['page']
 
         if check_user2(token, user_id):
-            articles = Article.objects.all().order_by('-date')
+            articles = Article.objects.all().order_by('-date').annotate
 
             paginator = Paginator(articles, 10)
             articles = paginator.page(page)
@@ -26,7 +26,12 @@ def get_articles(request):
             articles_dict = []
 
             for article in articles:
-                articles_dict.append(article.to_dict())
+                article_dict = article.to_dict()
+                if FavoriteArticle.objects.filter(user=user_id, article=article.id).exists():
+                    article_dict['is_favorite'] = True
+                else:
+                    article_dict['is_favorite'] = False
+                articles_dict.append(article_dict)
 
             return JsonResponse({'result': 'ok', 'articles': articles_dict})
         
