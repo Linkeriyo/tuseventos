@@ -27,7 +27,7 @@ def get_articles(request):
 
             for article in articles:
                 article_dict = article.to_dict()
-                if FavoriteArticle.objects.filter(user=user_id, article=article.id).exists():
+                if FavoriteArticle.objects.filter(user=user_id, article=article.id).count() > 0:
                     article_dict['is_favorite'] = True
                 else:
                     article_dict['is_favorite'] = False
