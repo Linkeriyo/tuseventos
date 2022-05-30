@@ -31,6 +31,11 @@ def get_articles(request):
                     article_dict['is_favorite'] = True
                 else:
                     article_dict['is_favorite'] = False
+                
+                if RemindMeArticle.objects.filter(user=user_id, article=article.id).count() > 0:
+                    article_dict['is_remindme'] = True
+                else:
+                    article_dict['is_remindme'] = False
                 articles_dict.append(article_dict)
 
             return JsonResponse({'result': 'ok', 'articles': articles_dict})
@@ -107,7 +112,18 @@ def get_article(request):
             article = get_object_or_None(Article, id=article_id)
 
             if article:
-                return JsonResponse({'result': 'ok', 'article': article.to_dict()})
+                article_dict = article.to_dict()
+                if FavoriteArticle.objects.filter(user=user_id, article=article.id).count() > 0:
+                    article_dict['is_favorite'] = True
+                else:
+                    article_dict['is_favorite'] = False
+                
+                if RemindMeArticle.objects.filter(user=user_id, article=article.id).count() > 0:
+                    article_dict['is_remindme'] = True
+                else:
+                    article_dict['is_remindme'] = False
+                    
+                return JsonResponse({'result': 'ok', 'article': article_dict})
 
             return JsonResponse({'result': 'error', 'message': 'Artículo no encontrado'})
         
