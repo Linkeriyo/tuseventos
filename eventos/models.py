@@ -20,7 +20,7 @@ class Article(models.Model):
             'subtitle': self.subtitle,
             'text': self.text,
             'image': self.image.url if self.image else None,
-            'date': self.date,
+            'date': self.date.strftime('%Y-%m-%d %H:%M:%S'),
             'lat': self.lat,
             'lng': self.lng
         }
