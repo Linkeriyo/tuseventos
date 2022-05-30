@@ -69,7 +69,7 @@ def get_favorite_articles(request):
 
 
 @csrf_exempt
-def get_remind_me_articles(request):
+def get_remindme_articles(request):
     try:
         data = json.loads(request.POST['data'])
         token = data['token']
