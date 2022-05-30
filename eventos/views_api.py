@@ -176,3 +176,65 @@ def remove_favorite_article(request):
     
     except Exception as e:
         return JsonResponse({'result': 'error', 'message': str(e)})
+
+
+@csrf_exempt
+def add_remindme_article(request):
+    try:
+        data = json.loads(request.POST['data'])
+        token = data['token']
+        user_id = data['user_id']
+        article_id = data['article_id']
+        
+        if check_user2(token, user_id):
+            article = get_object_or_None(Article, id=article_id)
+            user = get_object_or_None(User, id=user_id)
+            
+            if article and user:
+                remind_me_article = get_object_or_None(RemindMeArticle, article__id=article_id, user__id=user_id)
+                
+                if remind_me_article:
+                    return JsonResponse({'result': 'error', 'message': 'Artículo ya agregado a recordarme'})
+                
+                remind_me_article = RemindMeArticle(article=article, user=user)
+                remind_me_article.save()
+                
+                return JsonResponse({'result': 'ok', 'message': 'Artículo agregado a recordarme'})
+            
+            return JsonResponse({'result': 'error', 'message': 'Artículo o usuario no encontrado'})
+        
+        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
+    
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})
+
+
+@csrf_exempt
+def remove_remindme_article(request):
+    try:
+        data = json.loads(request.POST['data'])
+        token = data['token']
+        user_id = data['user_id']
+        article_id = data['article_id']
+        
+        if check_user2(token, user_id):
+            article = get_object_or_None(Article, id=article_id)
+            user = get_object_or_None(User, id=user_id)
+            
+            if article and user:
+                remind_me_article = get_object_or_None(RemindMeArticle, article__id=article_id, user__id=user_id)
+                
+                if remind_me_article:
+                    remind_me_article.delete()
+                    
+                    return JsonResponse({'result': 'ok', 'message': 'Artículo eliminado de recordarme'})
+                
+                return JsonResponse({'result': 'error', 'message': 'Artículo no encontrado'})
+            
+            return JsonResponse({'result': 'error', 'message': 'Artículo o usuario no encontrado'})
+        
+        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
+    
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})
+    
