@@ -18,7 +18,7 @@ def get_articles(request):
         page = data['page']
 
         if check_user2(token, user_id):
-            articles = Article.objects.all().order_by('-date').annotate
+            articles = Article.objects.all().order_by('-date')
 
             paginator = Paginator(articles, 10)
             articles = paginator.page(page)
