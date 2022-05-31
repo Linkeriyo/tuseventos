@@ -1,7 +1,7 @@
 import json
 
 from django.http import JsonResponse
-from eventos.models import Article, FavoriteArticle, RemindMeArticle
+from eventos.models import Article, ArticleType, FavoriteArticle, RemindMeArticle
 from django.core.paginator import Paginator
 from usuarios.views_api import check_user2
 from django.views.decorators.csrf import csrf_exempt
@@ -16,9 +16,13 @@ def get_articles(request):
         token = data['token']
         user_id = data['user_id']
         page = data['page']
+        type_id = data['type_id']
 
         if check_user2(token, user_id):
-            articles = Article.objects.all().order_by('-date')
+            if type_id:
+                articles = Article.objects.filter(article_type__id=type_id).order_by('-date_created')
+            else:
+                articles = Article.objects.all().order_by('-date_created')
 
             paginator = Paginator(articles, 10)
             articles = paginator.page(page)
@@ -53,9 +57,13 @@ def get_favorite_articles(request):
         token = data['token']
         user_id = data['user_id']
         page = data['page']
+        type_id = data['type_id']
         
         if check_user2(token, user_id):
-            fav_articles = FavoriteArticle.objects.filter(user__id=user_id).order_by('-article__date')
+            if type_id:
+                fav_articles = FavoriteArticle.objects.filter(user=user_id, article__article_type__id=type_id).order_by('-article__date_created')
+            else:
+                fav_articles = FavoriteArticle.objects.filter(user=user_id).order_by('-article__date_created')
 
             paginator = Paginator(fav_articles, 10)
             fav_articles = paginator.page(page)
@@ -80,9 +88,13 @@ def get_remindme_articles(request):
         token = data['token']
         user_id = data['user_id']
         page = data['page']
+        type_id = data['type_id']
         
         if check_user2(token, user_id):
-            remind_me_articles = RemindMeArticle.objects.filter(user__id=user_id).order_by('-article__date')
+            if type_id:
+                remindme_articles = RemindMeArticle.objects.filter(user=user_id, article__article_type__id=type_id).order_by('-article__date_created')
+            else:
+                remindme_articles = RemindMeArticle.objects.filter(user=user_id).order_by('-article__date_created')
             
             paginator = Paginator(remind_me_articles, 10)
             remind_me_articles = paginator.page(page)
@@ -254,3 +266,25 @@ def remove_remindme_article(request):
     except Exception as e:
         return JsonResponse({'result': 'error', 'message': str(e)})
     
+
+@csrf_exempt
+def get_article_types(request):
+    try:
+        data = json.loads(request.POST['data'])
+        token = data['token']
+        user_id = data['user_id']
+        
+        if check_user2(token, user_id):
+            article_types = ArticleType.objects.all()
+            
+            article_types_dict = []
+            
+            for article_type in article_types:
+                article_types_dict.append(article_type.to_dict())
+            
+            return JsonResponse({'result': 'ok', 'article_types': article_types_dict})
+        
+        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
+    
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})

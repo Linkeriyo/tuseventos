@@ -24,7 +24,8 @@ class Article(models.Model):
             'image': self.image.url if self.image else None,
             'date': self.date.strftime('%Y-%m-%d %H:%M:%S'),
             'lat': self.lat,
-            'lng': self.lng
+            'lng': self.lng,
+            'article_type': self.article_type.to_dict()
         }
 
 
