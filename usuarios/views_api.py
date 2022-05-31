@@ -10,6 +10,8 @@ from annoying.functions import get_object_or_None
 from usuarios.models import UserToken, generate_token
 
 # Create your views here.
+
+
 def get_user_by_token(token):
     user_token = get_object_or_None(UserToken, token=token)
 
@@ -25,7 +27,7 @@ def get_userdjango_by_id2(userdjango_id):
     return userdjango
 
 
-def check_user2(token,userdjango_id):
+def check_user2(token, userdjango_id):
     userdjango = get_userdjango_by_id2(userdjango_id)
     user_token = get_user_by_token(token)
 
@@ -36,6 +38,7 @@ def check_user2(token,userdjango_id):
             return False
     else:
         return False
+
 
 @csrf_exempt
 def login(request):
@@ -55,7 +58,7 @@ def login(request):
                         user=user,
                         token=generate_token(user)
                     )
-                
+
                 else:
                     user_token.token = generate_token(user)
                     user_token.save()
@@ -64,17 +67,17 @@ def login(request):
                     'result': 'ok',
                     'token': user_token.token
                 })
-                
+
             return JsonResponse({
                 'result': 'error',
                 'message': 'user_not_active'
             })
-        
+
         return JsonResponse({
             'result': 'error',
             'message': 'user_not_found'
         })
-    
+
     except Exception as e:
         return JsonResponse({
             'result': 'error',
@@ -99,12 +102,12 @@ def register(request):
         if user is not None:
             if user.is_active:
                 return login(request)
-            
+
             return JsonResponse({
                 'result': 'error',
                 'message': 'user_not_active'
             })
-        
+
         return JsonResponse({
             'result': 'error',
             'message': 'user_not_found'
@@ -129,23 +132,27 @@ def logout(request):
             token = request.POST['token']
             userdjango_id = request.POST['user_id']
 
-        if check_user2(token,userdjango_id):
+        if check_user2(token, userdjango_id):
             userdjango = get_user_by_token(token)
 
             user_token = get_object_or_None(UserToken, user=userdjango)
             if user_token is None:
-                response_data = {'result': 'ok', 'message': 'user already logged out'}
+                response_data = {'result': 'ok',
+                                 'message': 'user already logged out'}
             else:
 
                 user_token.delete()
-                response_data = {'result': 'ok', 'message': 'user logged out successfully'}
+                response_data = {'result': 'ok',
+                                 'message': 'user logged out successfully'}
         else:
-            response_data = {'result': 'error', 'message': 'user was not logged in'}
+            response_data = {'result': 'error',
+                             'message': 'user was not logged in'}
 
         return JsonResponse(response_data)
 
     except Exception as e:
-        response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
+        response_data = {'errorcode': 'U0002',
+                         'result': 'error', 'message': str(e)}
         return JsonResponse(response_data)
 
 
@@ -158,25 +165,40 @@ def change_credentials(request):
         password = datos.get('password')
         username = datos.get('username')
         email = datos.get('email')
-        
-        if check_user2(token,userdjango_id):
+
+        if check_user2(token, userdjango_id):
             userdjango = get_user_by_token(token)
             if userdjango is not None:
                 if password is not None:
                     userdjango.set_password(password)
-                if username is not None:
-                    userdjango.username = username
+                    password_changed = True
+                else:
+                    password_changed = False
+
                 if email is not None:
                     userdjango.email = email
+                    email_changed = True
+                else:
+                    email_changed = False
+
                 userdjango.save()
-                response_data = {'result': 'ok', 'message': 'user credentials changed successfully'}
+                
+                response_data = {
+                    'result': 'ok',
+                    'message': 'user credentials changed successfully',
+                    'password_changed': password_changed,
+                    'email_changed': email_changed
+                }
             else:
-                response_data = {'result': 'error', 'message': 'user not found'}
+                response_data = {'result': 'error',
+                                 'message': 'user not found'}
         else:
-            response_data = {'result': 'error', 'message': 'user not logged in'}
-        
+            response_data = {'result': 'error',
+                             'message': 'user not logged in'}
+
         return JsonResponse(response_data)
-    
+
     except Exception as e:
-        response_data = {'errorcode': 'U0003', 'result': 'error', 'message': str(e)}
+        response_data = {'errorcode': 'U0003',
+                         'result': 'error', 'message': str(e)}
         return JsonResponse(response_data)
