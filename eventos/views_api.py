@@ -19,7 +19,7 @@ def get_articles(request):
         type_id = data['type_id']
 
         if check_user2(token, user_id):
-            if type_id:
+            if type_id is None:
                 articles = Article.objects.filter(article_type__id=type_id).order_by('-date_created')
             else:
                 articles = Article.objects.all().order_by('-date_created')
@@ -60,7 +60,7 @@ def get_favorite_articles(request):
         type_id = data['type_id']
         
         if check_user2(token, user_id):
-            if type_id:
+            if type_id is None:
                 fav_articles = FavoriteArticle.objects.filter(user=user_id, article__article_type__id=type_id).order_by('-article__date_created')
             else:
                 fav_articles = FavoriteArticle.objects.filter(user=user_id).order_by('-article__date_created')
@@ -91,17 +91,17 @@ def get_remindme_articles(request):
         type_id = data['type_id']
         
         if check_user2(token, user_id):
-            if type_id:
+            if type_id is None:
                 remindme_articles = RemindMeArticle.objects.filter(user=user_id, article__article_type__id=type_id).order_by('-article__date_created')
             else:
                 remindme_articles = RemindMeArticle.objects.filter(user=user_id).order_by('-article__date_created')
             
-            paginator = Paginator(remind_me_articles, 10)
-            remind_me_articles = paginator.page(page)
+            paginator = Paginator(remindme_articles, 10)
+            remindme_articles = paginator.page(page)
             
             articles_dict = []
             
-            for remind_me_article in remind_me_articles:
+            for remind_me_article in remindme_articles:
                 articles_dict.append(remind_me_article.article.to_dict())
             
             return JsonResponse({'result': 'ok', 'articles': articles_dict})
