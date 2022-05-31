@@ -147,3 +147,36 @@ def logout(request):
     except Exception as e:
         response_data = {'errorcode': 'U0002', 'result': 'error', 'message': str(e)}
         return JsonResponse(response_data)
+
+
+@csrf_exempt
+def change_credentials(request):
+    try:
+        datos = json.loads(request.POST['data'])
+        token = datos.get('token')
+        userdjango_id = datos.get('user_id')
+        password = datos.get('password')
+        username = datos.get('username')
+        email = datos.get('email')
+        
+        if check_user2(token,userdjango_id):
+            userdjango = get_user_by_token(token)
+            if userdjango is not None:
+                if password is not None:
+                    userdjango.set_password(password)
+                if username is not None:
+                    userdjango.username = username
+                if email is not None:
+                    userdjango.email = email
+                userdjango.save()
+                response_data = {'result': 'ok', 'message': 'user credentials changed successfully'}
+            else:
+                response_data = {'result': 'error', 'message': 'user not found'}
+        else:
+            response_data = {'result': 'error', 'message': 'user not logged in'}
+        
+        return JsonResponse(response_data)
+    
+    except Exception as e:
+        response_data = {'errorcode': 'U0003', 'result': 'error', 'message': str(e)}
+        return JsonResponse(response_data)
