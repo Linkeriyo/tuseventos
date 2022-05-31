@@ -16,7 +16,10 @@ def get_articles(request):
         token = data['token']
         user_id = data['user_id']
         page = data['page']
-        type_id = data['type_id']
+        try:
+            type_id = data['type_id']
+        except:
+            type_id = None
 
         if check_user2(token, user_id):
             if type_id is None:
@@ -57,7 +60,10 @@ def get_favorite_articles(request):
         token = data['token']
         user_id = data['user_id']
         page = data['page']
-        type_id = data['type_id']
+        try:
+            type_id = data['type_id']
+        except:
+            type_id = None
         
         if check_user2(token, user_id):
             if type_id is None:
@@ -88,7 +94,10 @@ def get_remindme_articles(request):
         token = data['token']
         user_id = data['user_id']
         page = data['page']
-        type_id = data['type_id']
+        try:
+            type_id = data['type_id']
+        except:
+            type_id = None
         
         if check_user2(token, user_id):
             if type_id is None:
