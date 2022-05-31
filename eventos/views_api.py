@@ -22,7 +22,7 @@ def get_articles(request):
             type_id = None
 
         if check_user2(token, user_id):
-            if type_id is None:
+            if type_id is not None:
                 articles = Article.objects.filter(article_type__id=type_id).order_by('-date_created')
             else:
                 articles = Article.objects.all().order_by('-date_created')
@@ -66,7 +66,7 @@ def get_favorite_articles(request):
             type_id = None
         
         if check_user2(token, user_id):
-            if type_id is None:
+            if type_id is not None:
                 fav_articles = FavoriteArticle.objects.filter(user=user_id, article__article_type__id=type_id).order_by('-article__date_created')
             else:
                 fav_articles = FavoriteArticle.objects.filter(user=user_id).order_by('-article__date_created')
@@ -100,7 +100,7 @@ def get_remindme_articles(request):
             type_id = None
         
         if check_user2(token, user_id):
-            if type_id is None:
+            if type_id is not None:
                 remindme_articles = RemindMeArticle.objects.filter(user=user_id, article__article_type__id=type_id).order_by('-article__date_created')
             else:
                 remindme_articles = RemindMeArticle.objects.filter(user=user_id).order_by('-article__date_created')
