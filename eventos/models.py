@@ -10,6 +10,7 @@ class Article(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
+    article_type = models.ForeignKey('ArticleType', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -54,4 +55,19 @@ class RemindMeArticle(models.Model):
             'id': self.id,
             'user': self.user.username,
             'article': self.article.title
+        }
+
+
+class ArticleType(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description
         }
