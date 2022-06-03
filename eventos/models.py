@@ -25,26 +25,11 @@ class Article(models.Model):
             'date': self.date.strftime('%Y-%m-%d %H:%M:%S'),
             'lat': self.lat,
             'lng': self.lng,
-            'article_type': self.article_type.to_dict()
+            'article_type': self.article_type.to_dict(),
         }
 
 
 class FavoriteArticle(models.Model):
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
-    article = models.ForeignKey('Article', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.user.username + ' - ' + self.article.title
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'user': self.user.username,
-            'article': self.article.title
-        }
-
-
-class RemindMeArticle(models.Model):
     user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     article = models.ForeignKey('Article', on_delete=models.CASCADE)
 

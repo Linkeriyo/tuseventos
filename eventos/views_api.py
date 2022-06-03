@@ -1,7 +1,7 @@
 import json
 
 from django.http import JsonResponse
-from eventos.models import Article, ArticleType, FavoriteArticle, RemindMeArticle
+from eventos.models import Article, ArticleType, FavoriteArticle
 from django.core.paginator import Paginator
 from usuarios.views_api import check_user2
 from django.views.decorators.csrf import csrf_exempt
@@ -38,11 +38,7 @@ def get_articles(request):
                     article_dict['is_favorite'] = True
                 else:
                     article_dict['is_favorite'] = False
-                
-                if RemindMeArticle.objects.filter(user=user_id, article=article.id).count() > 0:
-                    article_dict['is_remindme'] = True
-                else:
-                    article_dict['is_remindme'] = False
+
                 articles_dict.append(article_dict)
 
             return JsonResponse({'result': 'ok', 'articles': articles_dict})
@@ -88,40 +84,6 @@ def get_favorite_articles(request):
 
 
 @csrf_exempt
-def get_remindme_articles(request):
-    try:
-        data = json.loads(request.POST['data'])
-        token = data['token']
-        user_id = data['user_id']
-        page = data['page']
-        try:
-            type_id = data['type_id']
-        except:
-            type_id = None
-        
-        if check_user2(token, user_id):
-            if type_id is not None:
-                remindme_articles = RemindMeArticle.objects.filter(user=user_id, article__article_type__id=type_id).order_by('-article__date_created')
-            else:
-                remindme_articles = RemindMeArticle.objects.filter(user=user_id).order_by('-article__date_created')
-            
-            paginator = Paginator(remindme_articles, 10)
-            remindme_articles = paginator.page(page)
-            
-            articles_dict = []
-            
-            for remind_me_article in remindme_articles:
-                articles_dict.append(remind_me_article.article.to_dict())
-            
-            return JsonResponse({'result': 'ok', 'articles': articles_dict})
-        
-        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
-    
-    except Exception as e:
-        return JsonResponse({'result': 'error', 'message': str(e)})
-
-
-@csrf_exempt
 def get_article(request):
     try:
         data = json.loads(request.POST['data'])
@@ -138,11 +100,6 @@ def get_article(request):
                     article_dict['is_favorite'] = True
                 else:
                     article_dict['is_favorite'] = False
-                
-                if RemindMeArticle.objects.filter(user=user_id, article=article.id).count() > 0:
-                    article_dict['is_remindme'] = True
-                else:
-                    article_dict['is_remindme'] = False
                     
                 return JsonResponse({'result': 'ok', 'article': article_dict})
 
@@ -214,67 +171,6 @@ def remove_favorite_article(request):
     except Exception as e:
         return JsonResponse({'result': 'error', 'message': str(e)})
 
-
-@csrf_exempt
-def add_remindme_article(request):
-    try:
-        data = json.loads(request.POST['data'])
-        token = data['token']
-        user_id = data['user_id']
-        article_id = data['article_id']
-        
-        if check_user2(token, user_id):
-            article = get_object_or_None(Article, id=article_id)
-            user = get_object_or_None(User, id=user_id)
-            
-            if article and user:
-                remind_me_article = get_object_or_None(RemindMeArticle, article__id=article_id, user__id=user_id)
-                
-                if remind_me_article:
-                    return JsonResponse({'result': 'error', 'message': 'Artículo ya agregado a recordarme'})
-                
-                remind_me_article = RemindMeArticle(article=article, user=user)
-                remind_me_article.save()
-                
-                return JsonResponse({'result': 'ok', 'message': 'Artículo agregado a recordarme'})
-            
-            return JsonResponse({'result': 'error', 'message': 'Artículo o usuario no encontrado'})
-        
-        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
-    
-    except Exception as e:
-        return JsonResponse({'result': 'error', 'message': str(e)})
-
-
-@csrf_exempt
-def remove_remindme_article(request):
-    try:
-        data = json.loads(request.POST['data'])
-        token = data['token']
-        user_id = data['user_id']
-        article_id = data['article_id']
-        
-        if check_user2(token, user_id):
-            article = get_object_or_None(Article, id=article_id)
-            user = get_object_or_None(User, id=user_id)
-            
-            if article and user:
-                remind_me_article = get_object_or_None(RemindMeArticle, article__id=article_id, user__id=user_id)
-                
-                if remind_me_article:
-                    remind_me_article.delete()
-                    
-                    return JsonResponse({'result': 'ok', 'message': 'Artículo eliminado de recordarme'})
-                
-                return JsonResponse({'result': 'error', 'message': 'Artículo no encontrado'})
-            
-            return JsonResponse({'result': 'error', 'message': 'Artículo o usuario no encontrado'})
-        
-        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
-    
-    except Exception as e:
-        return JsonResponse({'result': 'error', 'message': str(e)})
-    
 
 @csrf_exempt
 def get_article_types(request):
