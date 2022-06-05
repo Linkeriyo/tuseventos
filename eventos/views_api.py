@@ -73,7 +73,9 @@ def get_favorite_articles(request):
             articles_dict = []
             
             for fav_article in fav_articles:
-                articles_dict.append(fav_article.article.to_dict())
+                article_dict = fav_article.article.to_dict()
+                article_dict['is_favorite'] = True
+                articles_dict.append(article_dict)
             
             return JsonResponse({'result': 'ok', 'articles': articles_dict})
         
