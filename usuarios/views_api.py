@@ -65,7 +65,9 @@ def login(request):
 
                 return JsonResponse({
                     'result': 'ok',
-                    'token': user_token.token
+                    'token': user_token.token,
+                    'username': user.username,
+                    'email': user.email
                 })
 
             return JsonResponse({
