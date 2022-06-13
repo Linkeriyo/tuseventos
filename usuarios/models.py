@@ -1,6 +1,7 @@
 from random import choice
 from string import ascii_lowercase, ascii_uppercase, digits
 from django.db import models
+from django.db.models.fields.json import JSONField
 
 # Create your models here.
 
@@ -27,6 +28,10 @@ class UserExtraData(models.Model):
     phone = models.CharField(max_length=20, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     image = models.ImageField(upload_to='static/user_images', null=True, blank=True)
+
+    # lista en JSON de los ids de los articulos leidos
+    read_articles = JSONField(default=list)
+
     
     def __str__(self):
         return self.user.username
@@ -37,7 +42,8 @@ class UserExtraData(models.Model):
             'user': self.user.username,
             'phone': self.phone,
             'birth_date': self.birth_date,
-            'image': self.image.url if self.image else None
+            'image': self.image.url if self.image else None,
+            'read_articles': self.read_articles,
         }
 
 
@@ -46,5 +52,14 @@ class UserToken(models.Model):
     token = models.CharField(max_length=80)
     created_at = models.DateTimeField(auto_now=True)
 
+
     def __str__(self):
         return self.user.username
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user': self.user.username,
+            'token': self.token,
+            'created_at': self.created_at,
+        }

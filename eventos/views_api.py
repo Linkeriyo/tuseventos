@@ -3,6 +3,7 @@ import json
 from django.http import JsonResponse
 from eventos.models import Article, ArticleType, FavoriteArticle
 from django.core.paginator import Paginator
+from usuarios.models import UserExtraData
 from usuarios.views_api import check_user2
 from django.views.decorators.csrf import csrf_exempt
 from annoying.functions import get_object_or_None
@@ -193,5 +194,69 @@ def get_article_types(request):
         
         return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
     
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})
+
+
+@csrf_exempt
+def read_article(request):
+    try:
+        data = json.loads(request.POST['data'])
+        token = data['token']
+        user_id = data['user_id']
+        article_id = data['article_id']
+
+        if check_user2(token, user_id):
+            article = get_object_or_None(Article, id=article_id)
+
+            if not article:
+                return JsonResponse({'result': 'error', 'message': 'Artículo no encontrado'})
+            
+            user_extra_data = get_object_or_None(UserExtraData, user__id=user_id)
+            if not user_extra_data:
+                user_extra_data = UserExtraData(user=get_object_or_None(User, id=user_id))
+                user_extra_data.save()
+            
+            user_extra_data.read_articles.append(article_id)
+            user_extra_data.save()
+
+            return JsonResponse({'result': 'ok', 'message': 'Artículo leído'})
+        
+        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
+    
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})
+
+
+@csrf_exempt
+def get_recommended_articles(request):
+    try:
+        data = json.loads(request.POST['data'])
+        token = data['token']
+        user_id = data['user_id']
+
+        if check_user2(token, user_id):
+            user_extra_data = get_object_or_None(UserExtraData, user__id=user_id)
+            if not user_extra_data:
+                user_extra_data = UserExtraData(user=get_object_or_None(User, id=user_id))
+                user_extra_data.save()
+
+            read_articles = user_extra_data.read_articles
+            
+            articles = Article.objects.filter(recommend=True)
+
+            articles_list = []
+
+            for article in articles:
+                if str(article.id) not in read_articles:
+                    articles_list.append(article)
+                
+                if len(articles_list) == 10:
+                    break
+
+            return JsonResponse({'result': 'ok', 'articles': [article.to_dict() for article in articles_list]})
+
+        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
+
     except Exception as e:
         return JsonResponse({'result': 'error', 'message': str(e)})

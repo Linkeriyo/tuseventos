@@ -11,6 +11,8 @@ class Article(models.Model):
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
     article_type = models.ForeignKey('ArticleType', on_delete=models.CASCADE)
+    recommend = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.title
@@ -26,6 +28,7 @@ class Article(models.Model):
             'lat': self.lat,
             'lng': self.lng,
             'article_type': self.article_type.to_dict(),
+            'recommend': self.recommend,
         }
 
 

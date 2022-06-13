@@ -9,4 +9,6 @@ urlpatterns = [
     path('add_favorite_article/', views_api.add_favorite_article),
     path('remove_favorite_article/', views_api.remove_favorite_article),
     path('get_article_types/', views_api.get_article_types),
+    path('read_article/', views_api.read_article),
+    path('get_recommended_articles/', views_api.get_recommended_articles),
 ]
