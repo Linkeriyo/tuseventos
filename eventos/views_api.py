@@ -216,9 +216,10 @@ def read_article(request):
             if not user_extra_data:
                 user_extra_data = UserExtraData(user=get_object_or_None(User, id=user_id))
                 user_extra_data.save()
-            
-            user_extra_data.read_articles.append(article_id)
-            user_extra_data.save()
+
+            if str(article.id) not in user_extra_data.read_articles:
+                user_extra_data.read_articles.append(article_id)
+                user_extra_data.save()
 
             return JsonResponse({'result': 'ok', 'message': 'Artículo leído'})
         
