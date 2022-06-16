@@ -261,7 +261,7 @@ def get_recommended_articles(request):
                 if len(articles_list) == 10:
                     break
 
-            return JsonResponse({'result': 'ok', 'articles': [article.to_dict() for article in articles_list]})
+            return JsonResponse({'result': 'ok', 'articles': articles_list})
 
         return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
 

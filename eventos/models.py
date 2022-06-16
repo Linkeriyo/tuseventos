@@ -13,7 +13,6 @@ class Article(models.Model):
     article_type = models.ForeignKey('ArticleType', on_delete=models.CASCADE)
     recommend = models.BooleanField(default=False)
 
-
     def __str__(self):
         return self.title
 
