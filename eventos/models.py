@@ -3,13 +3,13 @@ from django.db import models
 # Create your models here.
 class Article(models.Model):
     title = models.CharField(max_length=200)
-    subtitle = models.CharField(max_length=200, null=True, blank=True)
+    subtitle = models.CharField(max_length=200)
     text = models.TextField()
-    image = models.ImageField(upload_to='static/articles', null=True, blank=True)
+    image = models.ImageField(upload_to='static/articles')
     date = models.DateTimeField()
     date_created = models.DateTimeField(auto_now_add=True)
-    lat = models.FloatField(null=True, blank=True)
-    lng = models.FloatField(null=True, blank=True)
+    lat = models.FloatField()
+    lng = models.FloatField()
     article_type = models.ForeignKey('ArticleType', on_delete=models.CASCADE)
     recommend = models.BooleanField(default=False)
 
