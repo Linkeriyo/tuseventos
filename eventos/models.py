@@ -1,3 +1,4 @@
+from turtle import title
 from django.db import models
 
 # Create your models here.
@@ -59,3 +60,8 @@ class ArticleType(models.Model):
             'name': self.name,
             'description': self.description
         }
+
+
+class ArticleImage(models.Model):
+    article = models.ForeignKey('Article', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='static/images')
