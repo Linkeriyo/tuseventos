@@ -250,7 +250,13 @@ def get_recommended_articles(request):
 
             for article in articles:
                 if str(article.id) not in read_articles:
-                    articles_list.append(article)
+                    article_dict = article.to_dict()
+                    if FavoriteArticle.objects.filter(user=user_id, article=article.id).count() > 0:
+                        article_dict['is_favorite'] = True
+                    else:
+                        article_dict['is_favorite'] = False
+
+                    articles_list.append(article_dict)
                 
                 if len(articles_list) == 10:
                     break
