@@ -29,6 +29,7 @@ class Article(models.Model):
             'lng': self.lng,
             'article_type': self.article_type.to_dict(),
             'recommend': self.recommend,
+            'gallery_images': [article_image.image.url for article_image in self.articleimage_set.all()]
         }
 
 
