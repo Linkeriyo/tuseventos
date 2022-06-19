@@ -9,4 +9,5 @@ urlpatterns = [
     path('change_credentials/', views_api.change_credentials),
     path('chage_profile_picture/', views_api.change_profile_picture),
     path('remove_profile_picture/', views_api.remove_profile_picture),
+    path('get_self_profile_picture/', views_api.get_self_profile_picture),
 ]

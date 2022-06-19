@@ -295,4 +295,33 @@ def send_article_comment(request):
     except Exception as e:
         return JsonResponse({'result': 'error', 'message': str(e)})
     
+
+@csrf_exempt
+def get_comments_article(request):
+    try:
+        data = json.loads(request.POST['data'])
+        token = data['token']
+        user_id = data['user_id']
+        article_id = data['article_id']
+
+        if check_user2(token, user_id):
+            article = get_object_or_None(Article, id=article_id)
+
+            if not article:
+                return JsonResponse({'result': 'error', 'message': 'Artículo no encontrado'})
+            
+            comments = ArticleComment.objects.filter(article=article)
+
+            comments_list = []
+
+            for comment in comments:
+                comment_dict = comment.to_dict()
+                comments_list.append(comment_dict)
+
+            return JsonResponse({'result': 'ok', 'comments': comments_list})
+        
+        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
+
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})
     

@@ -245,3 +245,25 @@ def remove_profile_picture(request):
     
     except Exception as e:
         return JsonResponse({'result': 'error', 'message': str(e)})
+
+
+@csrf_exempt
+def get_self_profile_picture(request):
+    try:
+        datos = json.loads(request.POST['data'])
+        token = datos.get('token')
+        user_id = datos.get('user_id')
+
+        if check_user2(token, user_id):
+            user = get_object_or_None(User, id=user_id)
+            if user.userextradata.image is not None:
+                image = user.userextradata.image.url
+            else:
+                image = None
+
+            return JsonResponse({'result': 'ok', 'image': image})
+        
+        return JsonResponse({'result': 'error', 'message': 'user not logged in'})
+    
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})
