@@ -1,7 +1,7 @@
 import json
 
 from django.http import JsonResponse
-from eventos.models import Article, ArticleType, FavoriteArticle
+from eventos.models import Article, ArticleComment, ArticleType, FavoriteArticle
 from django.core.paginator import Paginator
 from usuarios.models import UserExtraData
 from usuarios.views_api import check_user2
@@ -267,3 +267,32 @@ def get_recommended_articles(request):
 
     except Exception as e:
         return JsonResponse({'result': 'error', 'message': str(e)})
+
+
+@csrf_exempt
+def send_article_comment(request):
+    try:
+        data = json.loads(request.POST['data'])
+        token = data['token']
+        user_id = data['user_id']
+        article_id = data['article_id']
+        comment_text = data['comment_text']
+    
+        if check_user2(token, user_id):
+            article = get_object_or_None(Article, id=article_id)
+            user = get_object_or_None(User, id=user_id)
+            
+            if article and user:
+                comment = ArticleComment(article=article, user=user, text=comment_text)
+                comment.save()
+                
+                return JsonResponse({'result': 'ok', 'message': 'Comentario enviado'})
+            
+            return JsonResponse({'result': 'error', 'message': 'Artículo o usuario no encontrado'})
+
+        return JsonResponse({'result': 'error', 'message': 'Usuario no autorizado'})
+    
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})
+    
+    

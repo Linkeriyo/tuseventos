@@ -11,4 +11,5 @@ urlpatterns = [
     path('get_article_types/', views_api.get_article_types),
     path('read_article/', views_api.read_article),
     path('get_recommended_articles/', views_api.get_recommended_articles),
+    path('send_article_comment/', views_api.send_article_comment),
 ]

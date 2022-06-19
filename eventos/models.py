@@ -29,7 +29,8 @@ class Article(models.Model):
             'lng': self.lng,
             'article_type': self.article_type.to_dict(),
             'recommend': self.recommend,
-            'gallery_images': [article_image.image.url for article_image in self.articleimage_set.all()]
+            'gallery_images': [article_image.image.url for article_image in self.articleimage_set.all()],
+            'comments': [comment.to_dict() for comment in self.articlecomment_set.all()]
         }
 
 
@@ -66,3 +67,22 @@ class ArticleType(models.Model):
 class ArticleImage(models.Model):
     article = models.ForeignKey('Article', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='static/images')
+
+
+class ArticleComment(models.Model):
+    article = models.ForeignKey('Article', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    text = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.user.username + ' - ' + self.article.title
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user': self.user.username,
+            'article': self.article.title,
+            'text': self.text,
+            'date': self.date.strftime('%Y-%m-%d %H:%M:%S')
+        }
