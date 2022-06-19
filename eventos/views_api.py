@@ -310,7 +310,7 @@ def get_comments_article(request):
             if not article:
                 return JsonResponse({'result': 'error', 'message': 'Artículo no encontrado'})
             
-            comments = ArticleComment.objects.filter(article=article)
+            comments = ArticleComment.objects.filter(article=article).order_by('-date')
 
             comments_list = []
 

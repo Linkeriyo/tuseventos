@@ -30,7 +30,7 @@ class Article(models.Model):
             'article_type': self.article_type.to_dict(),
             'recommend': self.recommend,
             'gallery_images': [article_image.image.url for article_image in self.articleimage_set.all()],
-            'comments': [comment.to_dict() for comment in self.articlecomment_set.all()]
+            'comments': [comment.to_dict() for comment in self.articlecomment_set.all().order_by('-date')]
         }
 
 
