@@ -79,11 +79,16 @@ class ArticleComment(models.Model):
         return self.user.username + ' - ' + self.article.title
 
     def to_dict(self):
-        return {
+        return_dict = {
             'id': self.id,
             'user': self.user.username,
-            'user_img': self.user.userextradata.image.url if self.user.userextradata else None,
             'article': self.article.title,
             'text': self.text,
             'date': self.date.strftime('%Y-%m-%d %H:%M:%S')
         }
+        
+        if self.user.userextradata != None:
+            if self.user.userextradata.image != None:
+                return_dict['user_image'] = self.user.userextradata.image.url
+        
+        return return_dict
