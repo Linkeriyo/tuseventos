@@ -82,6 +82,7 @@ class ArticleComment(models.Model):
         return {
             'id': self.id,
             'user': self.user.username,
+            'user_img': self.user.userextradata.image.url if self.user.userextradata else None,
             'article': self.article.title,
             'text': self.text,
             'date': self.date.strftime('%Y-%m-%d %H:%M:%S')

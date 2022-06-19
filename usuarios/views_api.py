@@ -204,3 +204,44 @@ def change_credentials(request):
         response_data = {'errorcode': 'U0003',
                          'result': 'error', 'message': str(e)}
         return JsonResponse(response_data)
+
+
+@csrf_exempt
+def change_profile_picture(request):
+    try:
+        datos = json.loads(request.POST['data'])
+        token = datos.get('token')
+        user_id = datos.get('user_id')
+
+        if check_user2(token, user_id):
+            image = request.FILES['image']
+            user = get_object_or_None(User, id=user_id)
+            user.userextradata.image = image
+            user.userextradata.save()
+
+            return JsonResponse({'result': 'ok', 'message': 'profile picture changed successfully'})
+
+        return JsonResponse({'result': 'error', 'message': 'user not logged in'})
+
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})
+
+
+@csrf_exempt
+def remove_profile_picture(request):
+    try:
+        datos = json.loads(request.POST['data'])
+        token = datos.get('token')
+        user_id = datos.get('user_id')
+
+        if check_user2(token, user_id):
+            user = get_object_or_None(User, id=user_id)
+            user.userextradata.image = None
+            user.userextradata.save()
+
+            return JsonResponse({'result': 'ok', 'message': 'profile picture removed successfully'})
+
+        return JsonResponse({'result': 'error', 'message': 'user not logged in'})
+    
+    except Exception as e:
+        return JsonResponse({'result': 'error', 'message': str(e)})
