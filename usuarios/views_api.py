@@ -219,7 +219,7 @@ def change_profile_picture(request):
             user.userextradata.image = image
             user.userextradata.save()
 
-            return JsonResponse({'result': 'ok', 'message': 'profile picture changed successfully'})
+            return JsonResponse({'result': 'ok', 'image': user.userextradata.image.url, 'message': 'profile picture changed successfully'})
 
         return JsonResponse({'result': 'error', 'message': 'user not logged in'})
 
